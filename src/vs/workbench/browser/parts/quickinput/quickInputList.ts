@@ -11,7 +11,7 @@ import * as dom from 'vs/base/browser/dom';
 import { dispose, IDisposable } from 'vs/base/common/lifecycle';
 import { WorkbenchList } from 'vs/platform/list/browser/listService';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
-import { IPickOpenEntry } from 'vs/platform/quickinput/common/quickInput';
+import { IQuickPickItem } from 'vs/platform/quickinput/common/quickInput';
 import { IMatch } from 'vs/base/common/filters';
 import { matchesFuzzyOcticonAware, parseOcticons } from 'vs/base/common/octicon';
 import { compareAnything } from 'vs/base/common/comparers';
@@ -31,13 +31,13 @@ const $ = dom.$;
 
 interface IListElement {
 	index: number;
-	item: IPickOpenEntry;
+	item: IQuickPickItem;
 	checked?: boolean;
 }
 
 class ListElement implements IListElement {
 	index: number;
-	item: IPickOpenEntry;
+	item: IQuickPickItem;
 	shouldAlwaysShow = false;
 	hidden = false;
 	private _onChecked = new Emitter<boolean>();
@@ -215,12 +215,12 @@ export class QuickInputList {
 	}
 
 	@memoize
-	get onFocusChange() {
+	get onDidFocusChange() {
 		return mapEvent(this.list.onFocusChange, e => e.elements.map(e => e.item));
 	}
 
 	@memoize
-	get onSelectionChange() {
+	get onDidSelectionChange() {
 		return mapEvent(this.list.onSelectionChange, e => e.elements.map(e => e.item));
 	}
 
@@ -267,7 +267,7 @@ export class QuickInputList {
 		}
 	}
 
-	setElements(elements: IPickOpenEntry[], canCheck = false): void {
+	setElements(elements: IQuickPickItem[], canCheck = false): void {
 		this.elementDisposables = dispose(this.elementDisposables);
 		this.elements = elements.map((item, index) => new ListElement({
 			index,
@@ -281,13 +281,18 @@ export class QuickInputList {
 		this.list.setFocus([]);
 	}
 
-	getCheckedElements() {
-		return this.elements.filter(e => e.checked)
+	getFocusedElements() {
+		return this.list.getFocusedElements()
 			.map(e => e.item);
 	}
 
-	getFocusedElements() {
-		return this.list.getFocusedElements()
+	getSelectedElements() {
+		return this.list.getSelectedElements()
+			.map(e => e.item);
+	}
+
+	getCheckedElements() {
+		return this.elements.filter(e => e.checked)
 			.map(e => e.item);
 	}
 

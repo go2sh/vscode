@@ -398,7 +398,7 @@ declare module 'vscode' {
 
 	//#endregion
 
-	//#region Multi-step input
+	//#region QuickInput API
 
 	export namespace window {
 
@@ -416,7 +416,7 @@ declare module 'vscode' {
 
 		hide(): void;
 
-		onHide: Event<void>;
+		onDidHide: Event<void>;
 
 		dispose(): void;
 	}
@@ -427,23 +427,29 @@ declare module 'vscode' {
 
 		placeholder: string;
 
-		onDidValueChange: Event<string>;
+		readonly onDidValueChange: Event<string>; // -> onDidChangeValue
 
-		onDidAccept: Event<string>;
+		readonly onDidAccept: Event<void>;
 
-		commands: QuickInputCommand[];
+		commands: ReadonlyArray<QuickInputCommand>; // -> QuickInputButton
 
-		onDidTriggerCommand: Event<QuickInputCommand>;
+		readonly onDidTriggerCommand: Event<QuickInputCommand>;
 
-		items: QuickPickItem[];
+		items: ReadonlyArray<QuickPickItem>;
 
 		canSelectMany: boolean;
 
-		builtInFilter: boolean;
+		builtInFilter: boolean; // -> Remove
 
-		selectedItems: QuickPickItem[];
+		// TODO: ignoreFocusOut, matchOnDescription, matchOnDetail, ...?
 
-		onDidSelectItem: Event<QuickPickItem>;
+		readonly focusedItems: ReadonlyArray<QuickPickItem>; // -> activeItems
+
+		readonly onDidFocusChange: Event<QuickPickItem[]>; // -> onDidChangeActive
+
+		readonly selectedItems: ReadonlyArray<QuickPickItem>;
+
+		readonly onDidSelectionChange: Event<QuickPickItem[]>; // -> onDidChangeSelection
 	}
 
 	export interface InputBox extends QuickInput {
@@ -454,13 +460,13 @@ declare module 'vscode' {
 
 		password: boolean;
 
-		onDidValueChange: Event<string>;
+		readonly onDidValueChange: Event<string>;
 
-		onDidAccept: Event<string>;
+		readonly onDidAccept: Event<string>;
 
-		commands: QuickInputCommand[];
+		commands: ReadonlyArray<QuickInputCommand>;
 
-		onDidTriggerCommand: Event<QuickInputCommand>;
+		readonly onDidTriggerCommand: Event<QuickInputCommand>;
 
 		prompt: string;
 

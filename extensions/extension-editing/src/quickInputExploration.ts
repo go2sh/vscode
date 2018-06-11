@@ -162,8 +162,8 @@ class MultiStepInput {
 							reject(InputFlowAction.back);
 						}
 					}),
-					input.onDidSelectItem(item => resolve(item)),
-					input.onHide(() => {
+					input.onDidSelectionChange(items => resolve(items[0])),
+					input.onDidHide(() => {
 						(async () => {
 							reject(shouldResume && await shouldResume() ? InputFlowAction.resume : InputFlowAction.cancel);
 						})()
@@ -212,7 +212,7 @@ class MultiStepInput {
 							input.validationMessage = validationMessage;
 						}
 					}),
-					input.onHide(() => {
+					input.onDidHide(() => {
 						(async () => {
 							reject(shouldResume && await shouldResume() ? InputFlowAction.resume : InputFlowAction.cancel);
 						})()
