@@ -427,29 +427,31 @@ declare module 'vscode' {
 
 		placeholder: string;
 
-		readonly onDidValueChange: Event<string>; // -> onDidChangeValue
+		readonly onDidChangeValue: Event<string>;
 
 		readonly onDidAccept: Event<void>;
 
-		commands: ReadonlyArray<QuickInputCommand>; // -> QuickInputButton
+		buttons: ReadonlyArray<QuickInputButton>;
 
-		readonly onDidTriggerCommand: Event<QuickInputCommand>;
+		readonly onDidTriggerButton: Event<QuickInputButton>;
 
 		items: ReadonlyArray<QuickPickItem>;
 
 		canSelectMany: boolean;
 
-		builtInFilter: boolean; // -> Remove
+		ignoreFocusOut: boolean;
 
-		// TODO: ignoreFocusOut, matchOnDescription, matchOnDetail, ...?
+		matchOnDescription: boolean;
 
-		readonly focusedItems: ReadonlyArray<QuickPickItem>; // -> activeItems
+		matchOnDetail: boolean;
 
-		readonly onDidFocusChange: Event<QuickPickItem[]>; // -> onDidChangeActive
+		readonly activeItems: ReadonlyArray<QuickPickItem>;
+
+		readonly onDidChangeActive: Event<QuickPickItem[]>;
 
 		readonly selectedItems: ReadonlyArray<QuickPickItem>;
 
-		readonly onDidSelectionChange: Event<QuickPickItem[]>; // -> onDidChangeSelection
+		readonly onDidChangeSelection: Event<QuickPickItem[]>;
 	}
 
 	export interface InputBox extends QuickInput {
@@ -460,20 +462,20 @@ declare module 'vscode' {
 
 		password: boolean;
 
-		readonly onDidValueChange: Event<string>;
+		readonly onDidChangeValue: Event<string>;
 
 		readonly onDidAccept: Event<string>;
 
-		commands: ReadonlyArray<QuickInputCommand>;
+		buttons: ReadonlyArray<QuickInputButton>;
 
-		readonly onDidTriggerCommand: Event<QuickInputCommand>;
+		readonly onDidTriggerButton: Event<QuickInputButton>;
 
 		prompt: string;
 
 		validationMessage: string;
 	}
 
-	export interface QuickInputCommand {
+	export interface QuickInputButton {
 		iconPath: string | Uri | { light: string | Uri; dark: string | Uri } | ThemeIcon;
 		tooltip?: string | undefined;
 	}

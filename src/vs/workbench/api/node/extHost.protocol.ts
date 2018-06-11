@@ -369,7 +369,11 @@ export interface TransferQuickPick extends BaseTransferQuickInput {
 
 	canSelectMany?: boolean;
 
-	builtInFilter?: boolean;
+	ignoreFocusOut?: boolean;
+
+	matchOnDescription?: boolean;
+
+	matchOnDetail?: boolean;
 }
 
 export interface TransferInputBox extends BaseTransferQuickInput {

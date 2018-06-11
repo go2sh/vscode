@@ -608,20 +608,20 @@ export class QuickInputService extends Component implements IQuickInputService {
 				input.onDidAccept(() => {
 					// TODO: multi-select case
 					if (!input.canSelectMany) {
-						const result = input.focusedItems[0];
+						const result = input.activeItems[0];
 						if (result) {
 							resolve(<any>result);
 							input.hide();
 						}
 					}
 				}),
-				input.onDidFocusChange(items => {
+				input.onDidChangeActive(items => {
 					const focused = items[0];
 					if (focused) {
 						progress(focused);
 					}
 				}),
-				input.onDidSelectionChange(items => {
+				input.onDidChangeSelection(items => {
 					if (!input.canSelectMany) {
 						const result = items[0];
 						if (result) {
@@ -660,7 +660,7 @@ export class QuickInputService extends Component implements IQuickInputService {
 		return new TPromise<string>((resolve, reject) => {
 			const input = this.createInputBox();
 			const validateInput = options.validateInput || (() => TPromise.as(undefined));
-			const onDidValueChange = debounceEvent(input.onDidValueChange, (last, cur) => cur, 100);
+			const onDidValueChange = debounceEvent(input.onDidChangeValue, (last, cur) => cur, 100);
 			let validationValue = '';
 			let validation = TPromise.as('');
 			const disposables = [
@@ -1001,7 +1001,9 @@ class QuickPick extends QuickInput implements IQuickPick {
 	private _items: IQuickPickItem[] = [];
 	private itemsUpdated = false;
 	private _canSelectMany = false;
-	private _builtInFilter = true;
+	private _ignoreFocusOut = true;
+	private _matchOnDescription = true;
+	private _matchOnDetail = true;
 	private _focusedItems: IQuickPickItem[] = [];
 	private onDidFocusChangeEmitter = new Emitter<IQuickPickItem[]>();
 	private _selectedItems: IQuickPickItem[] = [];
@@ -1071,27 +1073,44 @@ class QuickPick extends QuickInput implements IQuickPick {
 		this.update(); // TODO
 	}
 
-	// TODO: Remove for now?
-	get builtInFilter() {
-		return this._builtInFilter;
+	get ignoreFocusOut() {
+		return this._ignoreFocusOut;
 	}
 
-	set builtInFilter(builtInFilter: boolean) {
-		this._builtInFilter = builtInFilter;
+	set ignoreFocusOut(ignoreFocusOut: boolean) {
+		this._ignoreFocusOut = ignoreFocusOut;
 		this.update(); // TODO
 	}
 
-	get focusedItems() {
+	get matchOnDescription() {
+		return this._matchOnDescription;
+	}
+
+	set matchOnDescription(matchOnDescription: boolean) {
+		this._matchOnDescription = matchOnDescription;
+		this.update(); // TODO
+	}
+
+	get matchOnDetail() {
+		return this._matchOnDetail;
+	}
+
+	set matchOnDetail(matchOnDetail: boolean) {
+		this._matchOnDetail = matchOnDetail;
+		this.update(); // TODO
+	}
+
+	get activeItems() {
 		return this._focusedItems;
 	}
 
-	onDidFocusChange = this.onDidFocusChangeEmitter.event;
+	onDidChangeActive = this.onDidFocusChangeEmitter.event;
 
 	get selectedItems() {
 		return this._selectedItems;
 	}
 
-	onDidSelectionChange = this.onDidSelectionChangeEmitter.event;
+	onDidChangeSelection = this.onDidSelectionChangeEmitter.event;
 
 	show() {
 		if (!this.visible) {
@@ -1137,7 +1156,7 @@ class QuickPick extends QuickInput implements IQuickPick {
 					this.onDidSelectionChangeEmitter.fire(selectedItems);
 				}),
 			);
-			if (this.focusedItems.length) {
+			if (this.activeItems.length) {
 				this._focusedItems = [];
 				this.onDidFocusChangeEmitter.fire([]);
 			}
@@ -1238,7 +1257,7 @@ class InputBox extends QuickInput implements IInputBox {
 		this.update();
 	}
 
-	onDidValueChange = this.onDidValueChangeEmitter.event;
+	onDidChangeValue = this.onDidValueChangeEmitter.event;
 
 	onDidAccept = this.onDidAcceptEmitter.event;
 

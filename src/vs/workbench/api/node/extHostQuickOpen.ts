@@ -7,7 +7,7 @@
 import { TPromise } from 'vs/base/common/winjs.base';
 import { wireCancellationToken, asWinJsPromise } from 'vs/base/common/async';
 import { CancellationToken } from 'vs/base/common/cancellation';
-import { QuickPickOptions, QuickPickItem, InputBoxOptions, WorkspaceFolderPickOptions, WorkspaceFolder, QuickInput, QuickPick, InputBox, QuickInputCommand } from 'vscode';
+import { QuickPickOptions, QuickPickItem, InputBoxOptions, WorkspaceFolderPickOptions, WorkspaceFolder, QuickInput, QuickPick, InputBox, QuickInputButton } from 'vscode';
 import { MainContext, MainThreadQuickOpenShape, ExtHostQuickOpenShape, MyQuickPickItems, IMainContext, TransferQuickInput } from './extHost.protocol';
 import { ExtHostWorkspace } from 'vs/workbench/api/node/extHostWorkspace';
 import { ExtHostCommands } from 'vs/workbench/api/node/extHostCommands';
@@ -280,12 +280,14 @@ class ExtHostQuickPick extends ExtHostQuickInput implements QuickPick {
 	private _placeholder: string;
 	private _onDidValueChangeEmitter = new Emitter<string>();
 	private _onDidAcceptEmitter = new Emitter<void>();
-	private _commands: QuickInputCommand[] = [];
-	private _onDidTriggerCommandEmitter = new Emitter<QuickInputCommand>();
+	private _commands: QuickInputButton[] = [];
+	private _onDidTriggerCommandEmitter = new Emitter<QuickInputButton>();
 	private _items: QuickPickItem[] = [];
 	private _handlesToItems = new Map<number, QuickPickItem>();
 	private _canSelectMany = false;
-	private _builtInFilter = true;
+	private _ignoreFocusOut = true;
+	private _matchOnDescription = true;
+	private _matchOnDetail = true;
 	private _focusedItems: QuickPickItem[] = [];
 	private _onDidFocusChangeEmitter = new Emitter<QuickPickItem[]>();
 	private _selectedItems: QuickPickItem[] = [];
@@ -314,20 +316,20 @@ class ExtHostQuickPick extends ExtHostQuickInput implements QuickPick {
 		this.update({ placeholder });
 	}
 
-	onDidValueChange = this._onDidValueChangeEmitter.event;
+	onDidChangeValue = this._onDidValueChangeEmitter.event;
 
 	onDidAccept = this._onDidAcceptEmitter.event;
 
-	get commands() {
+	get buttons() {
 		return this._commands;
 	}
 
-	set commands(commands: QuickInputCommand[]) {
+	set buttons(commands: QuickInputButton[]) {
 		this._commands = commands;
 		this.update({ commands });
 	}
 
-	onDidTriggerCommand = this._onDidTriggerCommandEmitter.event;
+	onDidTriggerButton = this._onDidTriggerCommandEmitter.event;
 
 	get items() {
 		return this._items;
@@ -359,26 +361,44 @@ class ExtHostQuickPick extends ExtHostQuickInput implements QuickPick {
 		this.update({ canSelectMany });
 	}
 
-	get builtInFilter() {
-		return this._builtInFilter;
+	get ignoreFocusOut() {
+		return this._ignoreFocusOut;
 	}
 
-	set builtInFilter(builtInFilter: boolean) {
-		this._builtInFilter = builtInFilter;
-		this.update({ builtInFilter });
+	set ignoreFocusOut(ignoreFocusOut: boolean) {
+		this._ignoreFocusOut = ignoreFocusOut;
+		this.update({ ignoreFocusOut });
 	}
 
-	get focusedItems() {
+	get matchOnDescription() {
+		return this._matchOnDescription;
+	}
+
+	set matchOnDescription(matchOnDescription: boolean) {
+		this._matchOnDescription = matchOnDescription;
+		this.update({ matchOnDescription });
+	}
+
+	get matchOnDetail() {
+		return this._matchOnDetail;
+	}
+
+	set matchOnDetail(matchOnDetail: boolean) {
+		this._matchOnDetail = matchOnDetail;
+		this.update({ matchOnDetail });
+	}
+
+	get activeItems() {
 		return this._focusedItems;
 	}
 
-	onDidFocusChange = this._onDidFocusChangeEmitter.event;
+	onDidChangeActive = this._onDidFocusChangeEmitter.event;
 
 	get selectedItems() {
 		return this._selectedItems;
 	}
 
-	onDidSelectionChange = this._onDidSelectionChangeEmitter.event;
+	onDidChangeSelection = this._onDidSelectionChangeEmitter.event;
 
 	_fireDidAccept() {
 		this._onDidAcceptEmitter.fire();
@@ -406,8 +426,8 @@ class ExtHostInputBox extends ExtHostQuickInput implements InputBox {
 	private _validationMessage: string;
 	private _onDidValueChangeEmitter = new Emitter<string>();
 	private _onDidAcceptEmitter = new Emitter<string>();
-	private _commands: QuickInputCommand[] = [];
-	private _onDidTriggerCommandEmitter = new Emitter<QuickInputCommand>();
+	private _commands: QuickInputButton[] = [];
+	private _onDidTriggerCommandEmitter = new Emitter<QuickInputButton>();
 
 	constructor(proxy: MainThreadQuickOpenShape, extensionId: string, onDispose: () => void) {
 		super(proxy, extensionId, onDispose);
@@ -459,18 +479,18 @@ class ExtHostInputBox extends ExtHostQuickInput implements InputBox {
 		this.update({ validationMessage });
 	}
 
-	onDidValueChange = this._onDidValueChangeEmitter.event;
+	onDidChangeValue = this._onDidValueChangeEmitter.event;
 
 	onDidAccept = this._onDidAcceptEmitter.event;
 
-	get commands() {
+	get buttons() {
 		return this._commands;
 	}
 
-	set commands(commands: QuickInputCommand[]) {
+	set buttons(commands: QuickInputButton[]) {
 		this._commands = commands;
 		this.update({ commands });
 	}
 
-	onDidTriggerCommand = this._onDidTriggerCommandEmitter.event;
+	onDidTriggerButton = this._onDidTriggerCommandEmitter.event;
 }

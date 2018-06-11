@@ -124,10 +124,10 @@ export class MainThreadQuickOpen implements MainThreadQuickOpenShape {
 				input.onDidAccept(() => {
 					this._proxy.$onDidAccept(sessionId);
 				});
-				input.onDidFocusChange(items => {
+				input.onDidChangeActive(items => {
 					this._proxy.$onDidFocusChange(sessionId, items.map(item => (item as MyQuickPickItems).handle));
 				});
-				input.onDidSelectionChange(items => {
+				input.onDidChangeSelection(items => {
 					this._proxy.$onDidSelectionChange(sessionId, items.map(item => (item as MyQuickPickItems).handle));
 				});
 				session = input;

@@ -121,15 +121,19 @@ export interface IQuickPick extends IQuickInput {
 
 	canSelectMany: boolean;
 
-	builtInFilter: boolean;
+	ignoreFocusOut: boolean;
 
-	readonly focusedItems: ReadonlyArray<IQuickPickItem>;
+	matchOnDescription: boolean;
 
-	readonly onDidFocusChange: Event<IQuickPickItem[]>;
+	matchOnDetail: boolean;
+
+	readonly activeItems: ReadonlyArray<IQuickPickItem>;
+
+	readonly onDidChangeActive: Event<IQuickPickItem[]>;
 
 	readonly selectedItems: ReadonlyArray<IQuickPickItem>;
 
-	readonly onDidSelectionChange: Event<IQuickPickItem[]>;
+	readonly onDidChangeSelection: Event<IQuickPickItem[]>;
 }
 
 export interface IInputBox extends IQuickInput {
@@ -140,7 +144,7 @@ export interface IInputBox extends IQuickInput {
 
 	password: boolean;
 
-	readonly onDidValueChange: Event<string>;
+	readonly onDidChangeValue: Event<string>;
 
 	readonly onDidAccept: Event<string>;
 
