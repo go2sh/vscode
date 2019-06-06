@@ -1602,6 +1602,19 @@ declare module 'vscode' {
 		alwaysShow?: boolean;
 	}
 
+	export interface QuickPickSeparator {
+
+		/**
+		 * QuickPick element type.
+		 */
+		type: 'separator';
+
+		/**
+		 * A human readable string for the separator.
+		 */
+		label?: string;
+	}
+
 	/**
 	 * Options to configure the behavior of the quick pick UI.
 	 */
@@ -6464,7 +6477,7 @@ declare module 'vscode' {
 		 * @param token A token that can be used to signal cancellation.
 		 * @return A promise that resolves to the selected items or `undefined`.
 		 */
-		export function showQuickPick<T extends QuickPickItem>(items: T[] | Thenable<T[]>, options: QuickPickOptions & { canPickMany: true; }, token?: CancellationToken): Thenable<T[] | undefined>;
+		export function showQuickPick<T extends QuickPickItem>(items: (T | QuickPickSeparator)[] | Thenable<(T | QuickPickSeparator)[]>, options: QuickPickOptions & { canPickMany: true; }, token?: CancellationToken): Thenable<T[] | undefined>;
 
 		/**
 		 * Shows a selection list.
@@ -6474,7 +6487,7 @@ declare module 'vscode' {
 		 * @param token A token that can be used to signal cancellation.
 		 * @return A promise that resolves to the selected item or `undefined`.
 		 */
-		export function showQuickPick<T extends QuickPickItem>(items: T[] | Thenable<T[]>, options?: QuickPickOptions, token?: CancellationToken): Thenable<T | undefined>;
+		export function showQuickPick<T extends QuickPickItem>(items: (T | QuickPickSeparator)[] | Thenable<(T | QuickPickSeparator)[]>, options?: QuickPickOptions, token?: CancellationToken): Thenable<T | undefined>;
 
 		/**
 		 * Shows a selection list of [workspace folders](#workspace.workspaceFolders) to pick from.
@@ -7173,7 +7186,7 @@ declare module 'vscode' {
 		/**
 		 * Items to pick from.
 		 */
-		items: ReadonlyArray<T>;
+		items: ReadonlyArray<T | QuickPickSeparator>;
 
 		/**
 		 * If multiple items can be selected at the same time. Defaults to false.
